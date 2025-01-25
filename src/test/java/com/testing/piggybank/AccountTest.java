@@ -4,7 +4,6 @@ import com.testing.piggybank.account.AccountController;
 import com.testing.piggybank.account.AccountRepository;
 import com.testing.piggybank.account.AccountResponse;
 import com.testing.piggybank.account.GetAccountsResponse;
-import com.testing.piggybank.model.Account;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,45 +12,59 @@ import org.springframework.http.ResponseEntity;
 
 @SpringBootTest
 public class AccountTest {
-    @Autowired
-    AccountController accountController;
 
     @Autowired
-    AccountRepository accountRepository;
+    private AccountController accountController;
 
     @Test
-    void getAccounts_withValidUserId_returnsListOfAccounts() {
-        long userId = 1L; //maakt een big int user id verbonden met de 1ste bankaccount
+        // Haal accounts op met ongeldige User ID
+    void AccountTest2() {
+        // Arrange
+        long userId = 99991L;
 
-        ResponseEntity<GetAccountsResponse> response = accountController.getAccounts(userId); //vraagt voor accounts (bankrekeningen) met een User id
-        Assertions.assertEquals(1, response.getBody().getAccounts().size()); //Krijgt 1 account terug want we hebben maar 1 account(bankrekening) gemaakt met userID
+        // Act
+        ResponseEntity<GetAccountsResponse> response = accountController.getAccounts(userId);
+
+        // Assert
+        Assertions.assertEquals(0, response.getBody().getAccounts().size(), "Er mogen geen accounts terugkomen.");
     }
 
     @Test
-    void getAccounts_withinValidUserId_returnEmptyListOfAccounts() {
-        long userId = 99991L; //maakt een big int met een userID die niet bestaat (er bestaan er maar 4)
+        // Haal account op met ongeldige Account ID
+    void AccountTest4() {
+        // Arrange
+        long accountId = 9991L;
 
-        ResponseEntity<GetAccountsResponse> response = accountController.getAccounts(userId); //vraagt voor accounts (bankrekeningen) met een User id
-        Assertions.assertEquals(0, response.getBody().getAccounts().size()); //Krijgt 0 account terug want we hebben geen valid userID
+        // Act
+        ResponseEntity<AccountResponse> response = accountController.getAccount(accountId);
+
+        // Assert
+        Assertions.assertNull(response.getBody(), "Account moet null zijn.");
     }
 
     @Test
-    void getAccount_withValidAccountId_returnsAccount() {
-        long accountId = 1L; //maakt een big int aan genaamd account id met de 1ste bankrekening, we noemen het account want we willen echt de bankrekening aanspreken
+        // Haal account op met geldige Account ID
+    void AccountTest3() {
+        // Arrange
+        long accountId = 1L;
 
-        ResponseEntity<AccountResponse> response = accountController.getAccount(accountId); //vraagt voor een accountID (bankrekening) met een account id
-        Assertions.assertNotNull(response.getBody(), "Response cant be null"); //Resultaat kan niet null zijn want de accountid is valid
+        // Act
+        ResponseEntity<AccountResponse> response = accountController.getAccount(accountId);
 
-
+        // Assert
+        Assertions.assertNotNull(response.getBody(), "Account mag niet null zijn.");
     }
 
     @Test
-    void getAccount_withInValidAccountId_returnsAccount() {
-        long accountId = 9991L; //Maakt een big int genaamd accountid met een id die niet bestaat
+        // Haal accounts op met geldige User ID
+    void AccountTest1() {
+        // Arrange
+        long userId = 1L;
 
-        ResponseEntity<AccountResponse> response = accountController.getAccount(accountId); //vraagt voor een account (bankrekening) met een account id
-        Assertions.assertNull(response.getBody(), "Response is null"); //Resultaat is null want de account id bestaat niet.
+        // Act
+        ResponseEntity<GetAccountsResponse> response = accountController.getAccounts(userId);
 
-
+        // Assert
+        Assertions.assertEquals(1, response.getBody().getAccounts().size(), "Er moet precies 1 account terugkomen.");
     }
 }
